@@ -162,8 +162,4 @@ def health():
 
 
 if __name__ == "__main__":
-    print("=" * 50)
-    print("  API Simplex rodando em http://localhost:5000")
-    print("  Endpoint: POST /resolver")
-    print("=" * 50)
-    app.run(debug=True, port=5000)
+    app.run(host="0.0.0.0", port=5000)
