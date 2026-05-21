@@ -1,5 +1,4 @@
 flask
 flask-cors
-scipy
 numpy
 gunicorn
