@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const API_URL = "http://localhost:5000/resolver";
+const API_URL = "https://solver-1.onrender.com/resolver";
 
 const defaultInputs = {
   proteina_min: 12, ferro_min: 9, tiamina_min: 15,
