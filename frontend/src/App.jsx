@@ -10,10 +10,10 @@ const defaultInputs = {
   tiamina_a: 1, tiamina_b: 3,
 };
 
-const inputStyle = {
-  background: "#071A1A",
-  border: "1px solid #2A4A4A",
-  color: "#F1F5F9",
+const getInputStyle = (theme) => ({
+  background: theme.inputBg,
+  border: `1px solid ${theme.borderInput}`,
+  color: theme.text,
   borderRadius: 10,
   padding: "9px 12px",
   width: "100%",
@@ -21,55 +21,79 @@ const inputStyle = {
   outline: "none",
   fontFamily: "Inter, system-ui, sans-serif",
   boxSizing: "border-box",
-};
-const painelResultadoStyle = {
-  background: "#102323",
-  border: "1px solid #1F3A3A",
-  borderRadius: 12,
-  padding: "8px 15px",
-  height: 430,
-  overflowY: "auto",
-  boxSizing: "border-box",
-};
+});
 
-function NumInput({ label, name, value, onChange, step = 1 }) {
+function NumInput({ label, name, value, onChange, step = 1, theme }) {
   return (
     <div style={{ marginBottom: 10 }}>
-      <label style={{ display: "block", fontSize: 12, color: "#94a3b8", marginBottom: 4 }}>{label}</label>
-      <input type="number" step={step} value={value} name={name}
+      <label style={{ display: "block", fontSize: 12, color: theme.muted, marginBottom: 4 }}>
+        {label}
+      </label>
+      <input
+        type="number"
+        step={step}
+        value={value}
+        name={name}
         onChange={e => onChange(name, parseFloat(e.target.value) || 0)}
-        style={inputStyle} />
+        style={getInputStyle(theme)}
+      />
     </div>
   );
 }
 
-function SectionTitle({ children, icon }) {
+function SectionTitle({ children, icon, theme }) {
   return (
     <div style={{
-      display: "flex", alignItems: "center", gap: 8, marginBottom: 14,
-      paddingBottom: 8, borderBottom: "1px solid #1e293b"
+      display: "flex",
+      alignItems: "center",
+      gap: 8,
+      marginBottom: 14,
+      paddingBottom: 8,
+      borderBottom: `1px solid ${theme.border}`
     }}>
       <span style={{ fontSize: 18 }}>{icon}</span>
-      <span style={{ fontFamily: "Inter, system-ui, sans-serif", fontSize: 15, color: "#5EEAD4", letterSpacing: 0.5 }}>
+      <span style={{
+        fontFamily: "Inter, system-ui, sans-serif",
+        fontSize: 15,
+        color: theme.title,
+        letterSpacing: 0.5
+      }}>
         {children}
       </span>
     </div>
   );
 }
 
-function NutriBar({ label, required, achieved }) {
+function NutriBar({ label, required, achieved, theme }) {
   const pct = Math.min(100, (achieved / required) * 100);
   const ok = achieved >= required - 0.01;
+
   return (
     <div style={{ marginBottom: 10 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#cbd5e1", marginBottom: 4 }}>
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        fontSize: 12,
+        color: theme.muted,
+        marginBottom: 4
+      }}>
         <span>{label}</span>
         <span>{achieved.toFixed(1)} / {required} {ok ? "✓" : "✗"}</span>
       </div>
-      <div style={{ background: "#1e293b", borderRadius: 4, height: 8, overflow: "hidden" }}>
+
+      <div style={{
+        background: theme.cardAlt,
+        borderRadius: 4,
+        height: 8,
+        overflow: "hidden"
+      }}>
         <div style={{
-          width: `${pct}%`, height: "100%", borderRadius: 4,
-          background: ok ? "linear-gradient(90deg,#22c55e,#4ade80)" : "linear-gradient(90deg,#ef4444,#f87171)",
+          width: `${pct}%`,
+          height: "100%",
+          borderRadius: 4,
+          background: ok
+            ? `linear-gradient(90deg, ${theme.success}, #4ade80)`
+            : `linear-gradient(90deg, ${theme.danger}, #f87171)`,
           transition: "width 0.6s ease"
         }} />
       </div>
@@ -83,6 +107,56 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("resultado");
+  const [darkMode, setDarkMode] = useState(true);
+
+  const theme = darkMode
+    ? {
+      page: "#071A1A",
+      card: "#102323",
+      cardAlt: "#0B1F1F",
+      border: "#1F3A3A",
+      borderInput: "#2A4A4A",
+      text: "#E2E8F0",
+      muted: "#94A3B8",
+      mutedDark: "#64748B",
+      title: "#5EEAD4",
+      accent: "#5EEAD4",
+      success: "#4ADE80",
+      danger: "#F87171",
+      warning: "#FBBF24",
+      info: "#7DD3FC",
+      inputBg: "#071A1A",
+      button: "#18B7A0",
+    }
+    : {
+      page: "#DDEBE8",
+      card: "#EAF3F1",
+      cardAlt: "#D4E5E2",
+      border: "#8FB8B2",
+      borderInput: "#8FB8B2",
+      text: "#123333",
+      muted: "#365F5F",
+      mutedDark: "#5F7F7F",
+      title: "#0F766E",
+      accent: "#0F766E",
+      success: "#15803D",
+      danger: "#B91C1C",
+      warning: "#B45309",
+      info: "#0369A1",
+      inputBg: "#F3FAF8",
+      button: "#18B7A0",
+    };
+  const painelResultadoStyle = {
+    background: theme.card,
+    border: `1px solid ${theme.border}`,
+    borderRadius: 12,
+    padding: "8px 15px",
+    height: 430,
+    overflowY: "auto",
+    boxSizing: "border-box",
+  };
+  const ThemedNumInput = (props) => <NumInput {...props} theme={theme} />;
+  const ThemedSectionTitle = (props) => <SectionTitle {...props} theme={theme} />;
 
   const handleChange = (name, val) => setInputs(prev => ({ ...prev, [name]: val }));
 
@@ -124,20 +198,63 @@ Sujeito a:
 
   return (
     <div style={{
-      minHeight: "100vh", background: "#071A1A", color: "#e2e8f0",
+      minHeight: "100vh", background: theme.page,
+      color: theme.text,
       fontFamily: "Inter, system-ui, sans-serif", padding: "24px 16px"
     }}>
 
       {/* Header */}
       <div style={{ width: "100%", margin: "0", textAlign: "center" }}>
         <br></br>
+        <button
+          onClick={() => setDarkMode(!darkMode)}
+          title={darkMode ? "Ativar modo claro" : "Ativar modo escuro"}
+          style={{
+            position: "fixed",
+            top: 22,
+            right: 28,
+            width: 54,
+            height: 54,
+            borderRadius: "50%",
+            border: `1px solid ${theme.border}`,
+            cursor: "pointer",
+            padding: 0,
+
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+
+            background: darkMode
+              ? theme.card
+              : theme.cardAlt,
+
+            color: theme.title,
+            fontSize: 28,
+            fontWeight: 700,
+            lineHeight: 1,
+
+            boxShadow: darkMode
+              ? "0 8px 24px rgba(0, 0, 0, 0.35)"
+              : "0 8px 24px rgba(15, 118, 110, 0.18)",
+
+            transition: "transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease",
+            zIndex: 9999,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "scale(1.07)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "scale(1)";
+          }}
+        >
+          {darkMode ? "☀" : "☾"}
+        </button>
         <h1 style={{
           fontFamily: "Inter, system-ui, sans-serif",
           fontSize: 42,
           fontWeight: 800,
-          background: "linear-gradient(135deg, #5EEAD4, #A7F3D0)", WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          margin: 0,
+          color: theme.title,
+          margin: "10px 0 0 0",
           lineHeight: 1.1
         }}>
           Solver Simplex Nutricional
@@ -168,43 +285,42 @@ Sujeito a:
             }}
           >
             <div style={{
-              background: "#102323",
-              border: "1px solid #1F3A3A",
+              background: theme.card,
+              border: `1px solid ${theme.border}`,
               borderRadius: 12,
               padding: 20,
               minHeight: 260,
               height: "100%",
               boxSizing: "border-box",
             }}>
-              <SectionTitle icon="🥗">Requisitos Mínimos</SectionTitle>
-              <NumInput label="Proteína mínima (un.)" name="proteina_min" value={inputs.proteina_min} onChange={handleChange} />
-              <NumInput label="Ferro mínimo (un.)" name="ferro_min" value={inputs.ferro_min} onChange={handleChange} />
-              <NumInput label="Tiamina mínima (un.)" name="tiamina_min" value={inputs.tiamina_min} onChange={handleChange} />
+              <ThemedSectionTitle icon="🥗">Requisitos Mínimos</ThemedSectionTitle>
+              <ThemedNumInput label="Proteína mínima (un.)" name="proteina_min" value={inputs.proteina_min} onChange={handleChange} />
+              <ThemedNumInput label="Ferro mínimo (un.)" name="ferro_min" value={inputs.ferro_min} onChange={handleChange} />
+              <ThemedNumInput label="Tiamina mínima (un.)" name="tiamina_min" value={inputs.tiamina_min} onChange={handleChange} />
             </div>
 
             <div style={{
-              background: "#102323",
-              border: "1px solid #1F3A3A",
+              background: theme.card,
+              border: `1px solid ${theme.border}`,
               borderRadius: 12,
               padding: 20,
               minHeight: 260,
               height: "100%",
               boxSizing: "border-box",
             }}>
-              <SectionTitle icon="💰">Custos (R$/grama)</SectionTitle>
-              <NumInput label="Custo Alimento A" name="custo_a" value={inputs.custo_a} onChange={handleChange} step={0.01} />
-              <NumInput label="Custo Alimento B" name="custo_b" value={inputs.custo_b} onChange={handleChange} step={0.01} />
+              <ThemedSectionTitle icon="💰">Custos (R$/grama)</ThemedSectionTitle>              <ThemedNumInput label="Custo Alimento A" name="custo_a" value={inputs.custo_a} onChange={handleChange} step={0.01} />
+              <ThemedNumInput label="Custo Alimento B" name="custo_b" value={inputs.custo_b} onChange={handleChange} step={0.01} />
             </div>
           </div>
           <div
             style={{
-              background: "#102323",
-              border: "1px solid #1F3A3A",
+              background: theme.card,
+              border: `1px solid ${theme.border}`,
               borderRadius: 12,
               padding: 12,
               marginBottom: 24,
             }}
-          >            <SectionTitle icon="🔬">Composição (un./grama)</SectionTitle>
+          >            <ThemedSectionTitle icon="🔬">Composição (un./grama)</ThemedSectionTitle>
             <div
               style={{
                 display: "grid",
@@ -212,16 +328,18 @@ Sujeito a:
                 gap: 18,
               }}
             >              <div>
-                <div style={{ fontSize: 12, color: "#94A3B8", marginBottom: 8, textTransform: "uppercase", letterSpacing: 1 }}>Alimento A</div>
-                <NumInput label="Proteína" name="proteina_a" value={inputs.proteina_a} onChange={handleChange} />
-                <NumInput label="Ferro" name="ferro_a" value={inputs.ferro_a} onChange={handleChange} />
-                <NumInput label="Tiamina" name="tiamina_a" value={inputs.tiamina_a} onChange={handleChange} />
+                <div style={{ fontSize: 12, color: darkMode ? "#94A3B8" : "#5F7F7F", marginBottom: 8, textTransform: "uppercase", letterSpacing: 1 }}>Alimento A</div>
+                <ThemedNumInput label="Proteína" name="proteina_a" value={inputs.proteina_a} onChange={handleChange} />
+                <ThemedNumInput label="Ferro" name="ferro_a" value={inputs.ferro_a} onChange={handleChange} />
+                <ThemedNumInput label="Tiamina" name="tiamina_a" value={inputs.tiamina_a} onChange={handleChange} />
               </div>
               <div>
-                <div style={{ fontSize: 11, color: "#475569", marginBottom: 8, textTransform: "uppercase", letterSpacing: 1 }}>Alimento B</div>
-                <NumInput label="Proteína" name="proteina_b" value={inputs.proteina_b} onChange={handleChange} />
-                <NumInput label="Ferro" name="ferro_b" value={inputs.ferro_b} onChange={handleChange} />
-                <NumInput label="Tiamina" name="tiamina_b" value={inputs.tiamina_b} onChange={handleChange} />
+                <div style={{ fontSize: 12, color: darkMode ? "#94A3B8" : "#5F7F7F", marginBottom: 8, textTransform: "uppercase", letterSpacing: 1 }}>
+                  Alimento B
+                </div>
+                <ThemedNumInput label="Proteína" name="proteina_b" value={inputs.proteina_b} onChange={handleChange} />
+                <ThemedNumInput label="Ferro" name="ferro_b" value={inputs.ferro_b} onChange={handleChange} />
+                <ThemedNumInput label="Tiamina" name="tiamina_b" value={inputs.tiamina_b} onChange={handleChange} />
               </div>
             </div>
           </div>
@@ -231,24 +349,25 @@ Sujeito a:
         <div>
           <div
             style={{
-              background: "#102323",
-              border: "1px solid #1F3A3A",
+              background: theme.card,
+              border: `1px solid ${theme.border}`,
               borderRadius: 12,
               padding: 12,
               marginBottom: 24,
             }}
           >
-            <SectionTitle icon="📐">Modelo Matemático</SectionTitle>
+            <ThemedSectionTitle icon="📐">Modelo Matemático</ThemedSectionTitle>
+
 
             <pre
               style={{
-                background: "#0B1F1F",
+                background: theme.cardAlt,
                 border: "1px solid #1F3A3A",
                 borderRadius: 8,
                 padding: "8px 10px",
                 fontFamily: "'JetBrains Mono', monospace",
                 fontSize: 11,
-                color: "#A7F3D0",
+                color: theme.text,
                 margin: 0,
                 lineHeight: 1.35,
                 whiteSpace: "pre-wrap",
@@ -263,7 +382,7 @@ Sujeito a:
           {error && (
             <div style={{
               background: "#450a0a", border: "1px solid #7f1d1d",
-              borderRadius: 12, padding: 20, marginBottom: 16, color: "#f87171"
+              borderRadius: 12, padding: 20, marginBottom: 16, color: theme.danger
             }}>
               <div style={{ fontWeight: 700, marginBottom: 6 }}>⚠ Erro de conexão</div>
               <div style={{ fontSize: 13 }}>{error}</div>
@@ -292,35 +411,36 @@ Sujeito a:
 
               {activeTab === "resultado" && (
                 <div style={painelResultadoStyle}>
-                  <SectionTitle icon="✅">Solução Ótima</SectionTitle>
+                  <ThemedSectionTitle icon="✅">Solução Ótima</ThemedSectionTitle>
+
                   {result.status === "ótimo" && (
                     <>
                       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 24 }}>
                         {[
                           { label: "Alimento A", value: `${result.solucao.A} g`, icon: "🟠", color: "#f97316" },
                           { label: "Alimento B", value: `${result.solucao.B} g`, icon: "🟢", color: "#22c55e" },
-                          { label: "Custo Mínimo", value: `R$ ${result.custo_otimo.toFixed(2)}`, icon: "💲", color: "#fbbf24" },
+                          { label: "Custo Mínimo", value: `R$ ${result.custo_otimo.toFixed(2)}`, icon: "💲", color: theme.warning },
                         ].map(card => (
                           <div key={card.label} style={{
-                            background: "#0B1F1F", border: "1px solid #1F3A3A",
+                            background: theme.cardAlt, border: "1px solid #1F3A3A",
                             borderRadius: 10, padding: "16px 20px", textAlign: "center"
                           }}>
                             <div style={{ fontSize: 24, marginBottom: 6 }}>{card.icon}</div>
                             <div style={{ fontSize: 22, fontWeight: 700, color: card.color, fontFamily: "Inter, system-ui, sans-serif" }}>
                               {card.value}
                             </div>
-                            <div style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>{card.label}</div>
+                            <div style={{ fontSize: 12, color: theme.mutedDark, marginTop: 4 }}>{card.label}</div>
                           </div>
                         ))}
                       </div>
-                      <div style={{ background: "#0B1F1F", border: "1px solid #1F3A3A", borderRadius: 10, padding: 16 }}>
-                        <div style={{ fontSize: 13, color: "#64748b", marginBottom: 10 }}>Folgas (surplus)</div>
+                      <div style={{ background: theme.cardAlt, border: "1px solid #1F3A3A", borderRadius: 10, padding: 16 }}>
+                        <div style={{ fontSize: 13, color: theme.mutedDark, marginBottom: 10 }}>Folgas (surplus)</div>
                         {Object.entries(result.surplus).map(([k, v]) => (
                           <div key={k} style={{
                             display: "flex", justifyContent: "space-between",
                             padding: "6px 0", borderBottom: "1px solid #0f172a", fontSize: 14
                           }}>
-                            <span style={{ color: "#cbd5e1" }}>{k}</span>
+                            <span style={{ color: theme.muted }}>{k}</span>
                             <span style={{ color: v === 0 ? "#f87171" : "#4ade80", fontFamily: "Inter, system-ui, sans-serif" }}>
                               {v === 0 ? "0 (ativo)" : `+${v}`}
                             </span>
@@ -330,7 +450,7 @@ Sujeito a:
                     </>
                   )}
                   {result.status !== "ótimo" && (
-                    <div style={{ textAlign: "center", padding: 32, color: "#f87171" }}>
+                    <div style={{ textAlign: "center", padding: 32, color: theme.danger }}>
                       Problema {result.status}. Revise os parâmetros.
                     </div>
                   )}
@@ -339,14 +459,14 @@ Sujeito a:
 
               {activeTab === "nutricao" && result.status === "ótimo" && nutriAchieved && (
                 <div style={painelResultadoStyle}>
-                  <SectionTitle icon="🥦">Verificação Nutricional</SectionTitle>
-                  <NutriBar label="Proteína" required={inputs.proteina_min} achieved={nutriAchieved["Proteína"]} />
-                  <NutriBar label="Ferro" required={inputs.ferro_min} achieved={nutriAchieved["Ferro"]} />
-                  <NutriBar label="Tiamina" required={inputs.tiamina_min} achieved={nutriAchieved["Tiamina"]} />
-                  <div style={{ marginTop: 20, background: "#0B1F1F", borderRadius: 10, padding: 16, fontSize: 13 }}>
+                  <ThemedSectionTitle icon="🥦">Verificação Nutricional</ThemedSectionTitle>
+                  <NutriBar label="Proteína" required={inputs.proteina_min} achieved={nutriAchieved["Proteína"]} theme={theme} />
+                  <NutriBar label="Ferro" required={inputs.ferro_min} achieved={nutriAchieved["Ferro"]} theme={theme} />
+                  <NutriBar label="Tiamina" required={inputs.tiamina_min} achieved={nutriAchieved["Tiamina"]} theme={theme} />
+                  <div style={{ marginTop: 20, background: theme.cardAlt, borderRadius: 10, padding: 16, fontSize: 13 }}>
                     <table style={{ width: "100%", borderCollapse: "collapse" }}>
                       <thead>
-                        <tr style={{ color: "#64748b", fontSize: 12 }}>
+                        <tr style={{ color: theme.mutedDark, fontSize: 12 }}>
                           {["Nutriente", "Contrib. A", "Contrib. B", "Total", "Mínimo", "OK"].map(h => (
                             <th key={h} style={{ padding: "4px 8px", textAlign: "left" }}>{h}</th>
                           ))}
@@ -362,11 +482,11 @@ Sujeito a:
                           const ok = total >= row.min - 0.01;
                           return (
                             <tr key={row.name} style={{ borderTop: "1px solid #1e293b" }}>
-                              <td style={{ padding: "8px", color: "#e2e8f0" }}>{row.name}</td>
-                              <td style={{ padding: "8px", fontFamily: "Inter, system-ui, sans-serif", color: "#7dd3fc" }}>{(row.a * result.solucao.A).toFixed(1)}</td>
+                              <td style={{ padding: "8px", color: theme.text }}>{row.name}</td>
+                              <td style={{ padding: "8px", fontFamily: "Inter, system-ui, sans-serif", color: theme.info }}>{(row.a * result.solucao.A).toFixed(1)}</td>
                               <td style={{ padding: "8px", fontFamily: "Inter, system-ui, sans-serif", color: "#86efac" }}>{(row.b * result.solucao.B).toFixed(1)}</td>
                               <td style={{ padding: "8px", fontFamily: "Inter, system-ui, sans-serif", fontWeight: 700 }}>{total.toFixed(1)}</td>
-                              <td style={{ padding: "8px", color: "#64748b" }}>{row.min}</td>
+                              <td style={{ padding: "8px", color: theme.mutedDark }}>{row.min}</td>
                               <td style={{ padding: "8px" }}>{ok ? "✅" : "❌"}</td>
                             </tr>
                           );
@@ -394,7 +514,7 @@ Sujeito a:
                         display: "flex",
                         alignItems: "center",
                         gap: 8,
-                        color: "#5EEAD4",
+                        color: theme.title,
                         fontSize: 15,
                         fontWeight: 700,
                       }}
@@ -409,7 +529,7 @@ Sujeito a:
                   </div>
                   {result.iteracoes.map((iter, idx) => (
                     <div key={idx} style={{
-                      background: "#0B1F1F",
+                      background: theme.cardAlt,
                       border: "1px solid #1F3A3A",
                       borderRadius: 8,
                       padding: "3px 4px",
@@ -417,12 +537,12 @@ Sujeito a:
                     }}>
                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                         <span style={{
-                          background: "rgba(56,189,248,0.15)", color: "#5EEAD4",
+                          background: "rgba(56,189,248,0.15)", color: theme.title,
                           borderRadius: 20, padding: "2px 10px", fontSize: 12, fontWeight: 700
                         }}>
                           Iteração {iter.iteracao}
                         </span>
-                        <span style={{ fontFamily: "monospace", fontSize: 13, color: "#fbbf24" }}>
+                        <span style={{ fontFamily: "monospace", fontSize: 13, color: theme.warning }}>
                           z = {iter.valor_z}
                         </span>
                       </div>
@@ -432,10 +552,10 @@ Sujeito a:
                         gap: 6,
                         fontSize: 12
                       }}>
-                        <div><span style={{ color: "#64748b" }}>Entra: </span>
-                          <span style={{ color: "#4ade80", fontFamily: "Inter, system-ui, sans-serif", fontWeight: 600 }}>{iter.entrando}</span></div>
-                        <div><span style={{ color: "#64748b" }}>Sai: </span>
-                          <span style={{ color: "#f87171", fontFamily: "Inter, system-ui, sans-serif", fontWeight: 600 }}>{iter.saindo}</span></div>
+                        <div><span style={{ color: theme.mutedDark }}>Entra: </span>
+                          <span style={{ color: theme.success, fontFamily: "Inter, system-ui, sans-serif", fontWeight: 600 }}>{iter.entrando}</span></div>
+                        <div><span style={{ color: theme.mutedDark }}>Sai: </span>
+                          <span style={{ color: theme.danger, fontFamily: "Inter, system-ui, sans-serif", fontWeight: 600 }}>{iter.saindo}</span></div>
                       </div>
                       <div style={{ marginTop: 4, fontSize: 11, color: "#475569" }}>
                         Base: {iter.base.join(", ")}
@@ -444,7 +564,7 @@ Sujeito a:
                   ))}
                   <div style={{
                     background: "rgba(34,197,94,0.08)", border: "1px solid #166534",
-                    borderRadius: 10, padding: 14, textAlign: "center", fontSize: 13, color: "#4ade80"
+                    borderRadius: 10, padding: 14, textAlign: "center", fontSize: 13, color: theme.success
                   }}>
                     ✓ Todos os custos reduzidos ≥ 0 — solução ótima atingida
                   </div>
@@ -488,7 +608,7 @@ Sujeito a:
                 height: 44,
                 borderRadius: 10,
                 border: "1px solid #2A4A4A",
-                background: "#0B1F1F",
+                background: theme.cardAlt,
                 color: "#94A3B8",
                 cursor: "pointer",
                 fontSize: 13,
@@ -501,12 +621,16 @@ Sujeito a:
 
           {!result && !error && !loading && (
             <div style={{
-              background: "#102323", border: "1px dashed #1e293b", borderRadius: 12,
-              padding: 48, textAlign: "center", color: "#475569"
+              background: theme.card,
+              border: `1px dashed ${theme.border}`,
+              borderRadius: 12,
+              padding: 48,
+              textAlign: "center",
+              color: theme.mutedDark
             }}>
               <div style={{ fontSize: 48, marginBottom: 12 }}>🔢</div>
               <div style={{ fontSize: 15 }}>Configure os parâmetros e clique em</div>
-              <div style={{ fontWeight: 700, color: "#5EEAD4", marginTop: 4 }}>▶ Resolver com Simplex</div>
+              <div style={{ fontWeight: 700, color: theme.title, marginTop: 4 }}>▶ Resolver com Simplex</div>
             </div>
           )}
         </div>
