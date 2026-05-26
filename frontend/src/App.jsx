@@ -26,7 +26,7 @@ const painelResultadoStyle = {
   background: "#102323",
   border: "1px solid #1F3A3A",
   borderRadius: 12,
-  padding: 24,
+  padding: "8px 15px",
   height: 430,
   overflowY: "auto",
   boxSizing: "border-box",
@@ -379,16 +379,43 @@ Sujeito a:
 
               {activeTab === "iteracoes" && (
                 <div style={painelResultadoStyle}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                    <SectionTitle icon="🔄">Iterações do Simplex</SectionTitle>
-                    <span style={{ fontSize: 12, color: "#475569" }}>{result.num_iteracoes} iteração(ões)</span>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginBottom: 8,
+                      paddingBottom: 8,
+                      borderBottom: "1px solid #1F3A3A",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        color: "#5EEAD4",
+                        fontSize: 15,
+                        fontWeight: 700,
+                      }}
+                    >
+                      <span>🔄</span>
+                      <span>Iterações do Simplex</span>
+                    </div>
+
+                    <span style={{ fontSize: 12, color: "#475569" }}>
+                      {result.num_iteracoes} iteração(ões)
+                    </span>
                   </div>
                   {result.iteracoes.map((iter, idx) => (
                     <div key={idx} style={{
-                      background: "#0B1F1F", border: "1px solid #1F3A3A",
-                      borderRadius: 10, padding: 16, marginBottom: 10
+                      background: "#0B1F1F",
+                      border: "1px solid #1F3A3A",
+                      borderRadius: 8,
+                      padding: "3px 4px",
+                      marginBottom: 6
                     }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                         <span style={{
                           background: "rgba(56,189,248,0.15)", color: "#5EEAD4",
                           borderRadius: 20, padding: "2px 10px", fontSize: 12, fontWeight: 700
@@ -399,13 +426,18 @@ Sujeito a:
                           z = {iter.valor_z}
                         </span>
                       </div>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, fontSize: 13 }}>
+                      <div style={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr",
+                        gap: 6,
+                        fontSize: 12
+                      }}>
                         <div><span style={{ color: "#64748b" }}>Entra: </span>
                           <span style={{ color: "#4ade80", fontFamily: "Inter, system-ui, sans-serif", fontWeight: 600 }}>{iter.entrando}</span></div>
                         <div><span style={{ color: "#64748b" }}>Sai: </span>
                           <span style={{ color: "#f87171", fontFamily: "Inter, system-ui, sans-serif", fontWeight: 600 }}>{iter.saindo}</span></div>
                       </div>
-                      <div style={{ marginTop: 8, fontSize: 12, color: "#475569" }}>
+                      <div style={{ marginTop: 4, fontSize: 11, color: "#475569" }}>
                         Base: {iter.base.join(", ")}
                       </div>
                     </div>
